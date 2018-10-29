@@ -3,12 +3,14 @@
 # key: ${ENV_VAR}
 # key: ${ENV_VAR-:default}
 # key: value
-# and "%{key}" can be used for settings values if available
+# and "%{key}" is used for settings values if available
+# %% is used to escape this % special character in your config
 variables:
   node_name_prefix: ${NODE_NAME_PREFIX:-node}
   node_hostname_prefix: ${NODE_HOSTNAME_PREFIX:-node}
   node_domain_affix: ${NODE_DOMAIN_AFFIX:-local}
-  # some_value: ${MY_VAR:-value}-affix
+  # some_env: ${MY_VAR:-value}-affix
+  # env_key: value
 
 
 
@@ -27,12 +29,19 @@ vagrant:
     #     latency: 0.5
     #     time_format: "%H:%M:%S"
     #     rsync_on_startup: true
+    #
+    # Plugin for vmware_desktop
+    # - _id: "1"
+    #   name: vagrant-vmware-desktop
+    #   version: "" # empty means latest by default
+    #   state: installed
+    #   enabled: true
 
 
 # default settings for all nodes
 default:
   vm:
-    box: bento/ubuntu-16.04
+    box: bento/ubuntu-18.04
     box_version:
     box_url:
     synced_folders: []
@@ -45,6 +54,21 @@ default:
       gui: false
       memory: 1024
       description: "%{node_name_prefix} #{Time.now.getutc.to_i}"
+
+    # you need to install vagrant-vmware-desktop first before use this provider
+    # see the installation steps at https://www.vagrantup.com/docs/vmware/installation.html
+    # or better when you configure the plugins for automation instead of manual
+    # - _id: "1"
+    #   enabled: true
+    #   type: vmware_desktop
+    #   gui: false
+    #   clone_directory: "./.vagrant" # Path for storing VMware clones. This value can also be set using the VAGRANT_VMWARE_CLONE_DIRECTORY environment variable. This defaults to ./.vagrant
+    #   enable_vmrun_ip_lookup: true # This defaults to true
+    #   vmx:
+    #     memsize: 1024
+    #     numvcpus: 2
+    #
+    #    More setting in https://www.vagrantup.com/docs/vmware/configuration.html
 
   provisioners: []
 

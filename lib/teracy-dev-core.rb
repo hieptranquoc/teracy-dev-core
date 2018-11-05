@@ -12,23 +12,18 @@ require_relative 'teracy-dev-core/config/winrm'
 require_relative 'teracy-dev-core/config/winssh'
 
 require_relative 'teracy-dev-core/processors/extension_path'
+require_relative 'teracy-dev-core/processors/unused_variables'
 require_relative 'teracy-dev-core/processors/variables'
 
 require_relative 'teracy-dev-core/providers/virtualbox'
 require_relative 'teracy-dev-core/providers/vmware'
+require_relative 'teracy-dev-core/providers/docker'
 
 module TeracyDevCore
   def self.init
-    TeracyDev.register_processor(TeracyDevCore::Processors::ExtensionPath.new)
-
-    # TODO(hoatle): update this to v0.6.0-a5 instead when it's released
-     if Gem::Version.new(TeracyDev::VERSION) >= Gem::Version.new('0.6.0-a5-SNAPSHOT')
-       # this api is available since 0.6.0-a5
-       # set this to be low so that this processor will be called at the very last order
-       TeracyDev.register_processor(TeracyDevCore::Processors::Variables.new, weight = 1)
-     else
-       TeracyDev.register_processor(TeracyDevCore::Processors::Variables.new)
-     end
+    TeracyDev.register_processor(TeracyDevCore::Processors::UnusedVariables.new, weight = 2)
+    TeracyDev.register_processor(TeracyDevCore::Processors::ExtensionPath.new, weight = 2)
+    TeracyDev.register_processor(TeracyDevCore::Processors::Variables.new, weight = 1)
 
     TeracyDev.register_configurator(TeracyDevCore::Config::VM.new)
     TeracyDev.register_configurator(TeracyDevCore::Config::Networks.new)
@@ -43,6 +38,7 @@ module TeracyDevCore
 
     self.register_provider("virtualbox", TeracyDevCore::Providers::VirtualBox.new)
     self.register_provider("vmware_desktop", TeracyDevCore::Providers::VMware.new)
+    self.register_provider("docker", TeracyDevCore::Providers::Docker.new)
   end
 
   # Register one or more provider implementations for a type
